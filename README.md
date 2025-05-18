@@ -26,7 +26,7 @@ Each step includes a **yellow instruction box** explaining the available command
 
 This repository includes:
 - The **Python source scripts** used to build the software.
-- The **PyInstaller build files** used to generate the standalone executable.
+- The main file that can be started to modify the GUI (then you must rebuild the exe file).
 - The actual **Windows executable** (`.exe`), available in the [Releases](https://github.com/Fraticss/STATIC_FEA_GUI/releases) section.
 
 ---
