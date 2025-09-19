@@ -194,6 +194,7 @@ def f_assemble_partial(args):
 
             for j in range(3):
 
+                # Just checking first node, since every node of the face has the same BC
                 if cond_BC[nodes_index[0],j] == 1:
                 
                     F_risultante = stress_BC[nodes_index,j] * Area
@@ -440,3 +441,4 @@ def sigma_assembly(P, T, u, E, nu, num_procs=4):
             stress_vm_nodes[i] /= counter[i]
 
     return sigma, stress_vm, stress_vm_nodes
+
