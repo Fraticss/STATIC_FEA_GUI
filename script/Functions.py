@@ -194,7 +194,6 @@ def f_assemble_partial(args):
 
             for j in range(3):
 
-                # Just checking first node, since every node of the face has the same BC
                 if cond_BC[nodes_index[0],j] == 1:
                 
                     F_risultante = stress_BC[nodes_index,j] * Area
@@ -231,9 +230,13 @@ def vincolo_x(K, f, P, input_dir):
 
     # Costruisci il percorso relativo al file
     Dirichlet_BC_path = os.path.join(input_dir, 'Dirichlet_BC.txt')
-    
+
     Dirichlet_BC = np.loadtxt(Dirichlet_BC_path, delimiter=',')
 
+    nodi_vincolati_out = Dirichlet_BC[:,0].astype(int)
+    cond_BC_out = np.array([Dirichlet_BC[:,1],Dirichlet_BC[:,2],Dirichlet_BC[:,3]]).T
+    def_BC_out = np.array([Dirichlet_BC[:,4],Dirichlet_BC[:,5],Dirichlet_BC[:,6]]).T
+    
     # riordino gli indici in modo che siano in ordine decrescente
     indici_ordinati = np.argsort(Dirichlet_BC[:, 0])[::-1]
     Dirichlet_BC = Dirichlet_BC[indici_ordinati,:]
@@ -247,11 +250,11 @@ def vincolo_x(K, f, P, input_dir):
 
         for j in range(2,-1,-1):
 
-            if cond_BC[i-1,j] == 1:
+            if cond_BC[i,j] == 1:
                 axis = 2-j
                 index = 3*nodi_vincolati[i] -axis -1 
 
-                f_new = def_BC[i-1,j]*K[:,index]
+                f_new = def_BC[i,j]*K[:,index]
 
                 idx_to_remove = np.append(idx_to_remove,index)
 
@@ -261,7 +264,7 @@ def vincolo_x(K, f, P, input_dir):
     K_new = K[idx_to_keep, :][:, idx_to_keep]           
     f_new = np.delete(f,idx_to_remove,1)
 
-    return K_new, f_new.T, nodi_vincolati
+    return K_new, f_new.T, nodi_vincolati_out, cond_BC_out, def_BC_out
 
 
 from scipy.sparse.linalg import cg
@@ -284,7 +287,7 @@ def lin_syst_solver_par(K, f, toll=1e-6):
     return u_new
 
 
-def u_composition(u_new, nodi_vincolati, n_nodi):
+def u_composition(u_new, n_nodi, nodi_vincolati, cond_BC, def_BC):
 
     u = np.array([])
     index = 0
@@ -295,7 +298,25 @@ def u_composition(u_new, nodi_vincolati, n_nodi):
         for j in range(len(nodi_vincolati)):
 
             if i==nodi_vincolati[j]:
-                u = np.append(u,np.array([0,0,0]))
+                
+                if cond_BC[j,0] == 1:
+                    u = np.append(u,def_BC[j,0])
+                else:
+                    u = np.append(u,u_new[index])
+                    index += 1
+                
+                if cond_BC[j,1] == 1:
+                    u = np.append(u,def_BC[j,1])
+                else:
+                    u = np.append(u,u_new[index])
+                    index += 1
+
+                if cond_BC[j,2] == 1:
+                    u = np.append(u,def_BC[j,2])
+                else:
+                    u = np.append(u,u_new[index])
+                    index += 1
+
                 check = 0
                 break
 
@@ -441,4 +462,3 @@ def sigma_assembly(P, T, u, E, nu, num_procs=4):
             stress_vm_nodes[i] /= counter[i]
 
     return sigma, stress_vm, stress_vm_nodes
-

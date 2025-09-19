@@ -77,7 +77,7 @@ def main_solver(Result_dir, E, nu, num_cores, print_func):
     start_time = time.time()
 
     # Applicazione Dirichlet BC
-    K, f, nodi_vincolati = fn_par.vincolo_x(K, f, P_matrix, input_dir)
+    K, f, nodi_vincolati, cond_BC, def_BC = fn_par.vincolo_x(K, f, P_matrix, input_dir)
 
      # COMPUTATION TIME
     end_time = time.time()
@@ -98,7 +98,7 @@ def main_solver(Result_dir, E, nu, num_cores, print_func):
     start_time = time.time()
 
     # Ricompongo il vettore u aggiungendo gli spostamenti(nulli) dei punti vincolati
-    u = fn_par.u_composition(u_new, nodi_vincolati, n_nodes)
+    u = fn_par.u_composition(u_new, n_nodes, nodi_vincolati, cond_BC, def_BC)
 
     end_time = time.time()
     elapsed_time[4] = end_time - start_time
