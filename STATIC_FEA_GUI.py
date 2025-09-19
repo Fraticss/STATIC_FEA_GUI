@@ -1042,7 +1042,7 @@ class Step5(tk.Frame):
                     print_func=print_to_output
                 )
             except Exception as e:
-                print_to_output(f"Errore durante la generazione mesh: {e}")
+                print_to_output(f"Error occurred: {e}")
 
         run_script()  # Esegui la funzione sul thread principale
 
@@ -1181,3 +1181,4 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
     app = FEMApp()
     app.mainloop()
+
